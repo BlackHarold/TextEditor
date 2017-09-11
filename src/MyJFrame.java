@@ -25,7 +25,7 @@ public class MyJFrame {
 
         //Cчитываем предопределенный файл в буфер и заполняем textArea
         JTextArea textArea = new JTextArea();
-        textArea.setEditable(false);
+        //textArea.setEditable(false);
         JScrollPane jScrollPane = new JScrollPane(textArea);
         FileInputStream fis;
         BufferedReader br;
@@ -56,9 +56,10 @@ public class MyJFrame {
 
         jButtonOK.addActionListener((ActionEvent e1) -> {
             if (jButtonOK.getName().equalsIgnoreCase("OK")) {
-
-                textArea.insert("\n", 0);
-                textArea.insert(textField.getText(), 0);
+                int findIdx = textArea.getCaretPosition();
+                System.out.println(findIdx);
+                /*textArea.insert("\n", 0);
+                textArea.insert(textField.getText(), 0);*/
 
                 /*FileInputStream fis1;
                 BufferedReader br1;
