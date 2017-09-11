@@ -8,12 +8,9 @@ import java.io.*;
 
 public class MyJFrame {
 
-
-
-
-
     public static void main(String[] args) {
 
+        //Применяю скинчик из стандартного набора
         try {
             UIManager.setLookAndFeel(new MetalLookAndFeel());
         } catch (UnsupportedLookAndFeelException e) {
@@ -23,10 +20,12 @@ public class MyJFrame {
         //Создаем текстовые поля
         JTextField textField = new JTextField();
 
-        //Cчитываем предопределенный файл в буфер и заполняем textArea
+        //Текстовую область засовываем в панель прокрутки
         JTextArea textArea = new JTextArea();
         //textArea.setEditable(false);
         JScrollPane jScrollPane = new JScrollPane(textArea);
+
+        //Cчитываю предопределенный файл в буфер и заполняю textArea
         FileInputStream fis;
         BufferedReader br;
         try {
@@ -48,41 +47,38 @@ public class MyJFrame {
             e.printStackTrace();
         }
 
-
         //Создаем кнопки (см. конструктор)
         MyJButton jButtonOK = new MyJButton("Записать", "OK");
         MyJButton jButtonErase = new MyJButton("Очистить", "Erase");
         MyJButton jButtonExit = new MyJButton("Выход", "Exit");
 
+        //Лямбдим листенеров
+        //Для ОК
         jButtonOK.addActionListener((ActionEvent e1) -> {
             if (jButtonOK.getName().equalsIgnoreCase("OK")) {
-                int findIdx = textArea.getCaretPosition();
-                System.out.println(findIdx);
-                /*textArea.insert("\n", 0);
-                textArea.insert(textField.getText(), 0);*/
+                /*System.out.println(findIdx);*/
+                //System.out.println(textArea.getText().length());
+                int findIndex = 0;
+                String findString = textField.getText();
+                String string = textArea.getText();
+                int idx = string.toLowerCase().indexOf(findString.toLowerCase());
+                textArea.setCaretPosition(findIndex);
 
-                /*FileInputStream fis1;
-                BufferedReader br1;
-                try {
-                    fis1 = new FileInputStream("D:\\text.txt");
-                    br1 = new BufferedReader(new InputStreamReader(fis1, "UTF-8"));
-                    String string1;
-                    while ((string1 = br1.readLine()) != null) {
-                        textArea.insert(string1 + "\n", 1);
-                        //textArea.insert("\n",0);
-                    }
-                } catch (FileNotFoundException e) {
-                    System.out.println("Файл D:\\text.txt не найден");
-                } catch (UnsupportedEncodingException e) {
-                    System.out.println("Не поддерживаемая кодировка файла");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }*/
-
-                System.out.println(jButtonOK.getName());
+                if (idx == -1) {
+                    textArea.insert("\n", 0);
+                    textArea.insert(findString, 0);
+                    System.out.println("текст записан, позиция курсора сброщена на 0");
+                } else {
+                    textArea.setCaretPosition(idx);
+                    textArea.select(idx,idx+findString.length());
+                    findIndex = idx;
+                    textArea.requestFocusInWindow();
+                    System.out.println("такая строка уже есть в тексте, позиция " + findIndex);
+                }
             }
 
         });
+        //Для Отмены ввода и очистки поля
         jButtonErase.addActionListener(e2 -> {
             if (jButtonErase.getName().equalsIgnoreCase("Erase")) {
                 System.out.println(jButtonErase.getName());
@@ -90,6 +86,7 @@ public class MyJFrame {
 
             }
         });
+        //Для выхода из программы
         jButtonExit.addActionListener(e3 -> {
             if (jButtonExit.getName().equalsIgnoreCase("Exit")) {
                 System.out.println(jButtonExit.getName());
@@ -98,34 +95,42 @@ public class MyJFrame {
         });
 
 
-        //Создаем панели размещения
+        //Создаю панели размещения
         JPanel panel1 = new JPanel(new BorderLayout());
         JPanel panel2 = new JPanel(new BorderLayout());
         JPanel panel3 = new JPanel(new BorderLayout());
 
+        //Предопределяю размер фрейма
         JFrame jFrame = new JFrame();
         jFrame.setSize(600, 400);
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        //Создаю тривиальную рамку
         Border etchedBorder = new EtchedBorder();
 
         panel1.setBorder(etchedBorder);
-        //panel2.setBorder(etchedBorder);
+        panel2.setBorder(etchedBorder);
         //panel3.setBorder(etchedBorder);
 
         panel1.add(textField);
         panel2.add(jScrollPane);
 
-        panel3.setLayout(new GridLayout(1, 3));
+
+        //Третья панель для кнопок
+        panel3.setLayout(new GridLayout(1, 3, 1,1));
         panel3.add(jButtonOK);
         panel3.add(jButtonErase);
         panel3.add(jButtonExit);
 
+        //Втыкаю панели на фрейм
         jFrame.add(panel1, BorderLayout.NORTH);
         jFrame.add(panel2, BorderLayout.CENTER);
         jFrame.add(panel3, BorderLayout.SOUTH);
 
+        //Поехали
         jFrame.setVisible(true);
 
     }
+
+
 }
