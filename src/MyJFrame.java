@@ -8,7 +8,7 @@ import java.io.*;
 
 public class MyJFrame {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         //Применяю скинчик из стандартного набора
         try {
@@ -22,29 +22,22 @@ public class MyJFrame {
 
         //Текстовую область засовываем в панель прокрутки
         JTextArea textArea = new JTextArea();
-        //textArea.setEditable(false);
         JScrollPane jScrollPane = new JScrollPane(textArea);
 
-        //Cчитываю предопределенный файл в буфер и заполняю textArea
-        FileInputStream fis;
-        BufferedReader br;
+        //Cчитываю предопределенный файл в буфер и заполняю textArea,
+        //если файл не найден создаю его
         try {
-            fis = new FileInputStream("D:\\text.txt");
-            br = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
+            BufferedReader br = new BufferedReader(new FileReader("text.txt"));
             String string;
             while ((string = br.readLine()) != null) {
                 textArea.append(string);
                 textArea.append("\n");
             }
             System.out.println("В поле выведено содержание файла");
-            fis.close();
-            br.close();
+
         } catch (FileNotFoundException e) {
-            System.out.println("Файл D:\\text.txt не найден");
-        } catch (UnsupportedEncodingException e) {
-            System.out.println("Не поддерживаемая кодировка файла");
-        } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Создан новый Файл");
+            File file = new File("text.txt");
         }
 
         //Создаем кнопки (см. конструктор)
@@ -53,11 +46,10 @@ public class MyJFrame {
         MyJButton jButtonExit = new MyJButton("Выход", "Exit");
 
         //Лямбдим листенеров
+
         //Для ОК
         jButtonOK.addActionListener((ActionEvent e1) -> {
             if (jButtonOK.getName().equalsIgnoreCase("OK")) {
-                /*System.out.println(findIdx);*/
-                //System.out.println(textArea.getText().length());
                 int findIndex = 0;
                 String findString = textField.getText();
                 String string = textArea.getText();
@@ -67,10 +59,21 @@ public class MyJFrame {
                 if (idx == -1) {
                     textArea.insert("\n", 0);
                     textArea.insert(findString, 0);
-                    System.out.println("текст записан, позиция курсора сброщена на 0");
+
+
+                    try {
+                        PrintWriter pw = new PrintWriter( new FileOutputStream("text.txt"),true);
+                        pw.write(textArea.getText());
+                        pw.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+
+
                 } else {
                     textArea.setCaretPosition(idx);
-                    textArea.select(idx,idx+findString.length());
+                    textArea.select(idx, idx + findString.length());
                     findIndex = idx;
                     textArea.requestFocusInWindow();
                     System.out.println("такая строка уже есть в тексте, позиция " + findIndex);
@@ -117,7 +120,7 @@ public class MyJFrame {
 
 
         //Третья панель для кнопок
-        panel3.setLayout(new GridLayout(1, 3, 1,1));
+        panel3.setLayout(new GridLayout(1, 3, 1, 1));
         panel3.add(jButtonOK);
         panel3.add(jButtonErase);
         panel3.add(jButtonExit);
